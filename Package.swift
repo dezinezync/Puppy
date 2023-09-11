@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -20,8 +20,7 @@ let package = Package(
     .target(name: "Puppy", dependencies: [.product(name: "Logging", package: "swift-log")],
             exclude: ["CMakeLists.txt"]),
     .testTarget(name: "PuppyTests", dependencies: ["Puppy"]),
-  ],
-  swiftLanguageVersions: [.v5]
+  ]
 )
 
 if let puppy = package.targets.first(where: { $0.name == "Puppy" }) {
