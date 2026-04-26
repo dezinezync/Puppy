@@ -4,22 +4,34 @@
 import PackageDescription
 
 let package = Package(
-  name: "Puppy",
-  platforms: [
-    .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6),
-  ],
-  products: [
-    .library(name: "Puppy", type: .dynamic, targets: ["Puppy"]),
-  ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-log.git", .upToNextMinor(from: "1.5.2")),
-  ],
-  targets: [
-    .target(name: "CPuppy",
-            exclude: ["CMakeLists.txt"]),
-    .target(name: "Puppy", dependencies: [.product(name: "Logging", package: "swift-log")],
-            exclude: ["CMakeLists.txt"]),
-    .testTarget(name: "PuppyTests", dependencies: ["Puppy"]),
+    name: "Puppy",
+    platforms: [
+        .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1),
+    ],
+    products: [
+        .library(name: "Puppy", targets: ["Puppy"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-log.git", .upToNextMinor(from: "1.6.3")),
+    ],
+    targets: [
+        .target(
+            name: "CPuppy",
+            path: "Sources/CPuppy",
+            exclude: ["CMakeLists.txt"]
+        ),
+        .target(
+            name: "Puppy",
+            dependencies: [.product(name: "Logging", package: "swift-log")],
+            path: "Sources/Puppy",
+            exclude: ["CMakeLists.txt"]
+        ),
+        .testTarget(
+            name: "PuppyTests",
+            dependencies: ["Puppy"],
+            path: "Tests/PuppyTests"
+        ),
+    ],
   ]
 )
 

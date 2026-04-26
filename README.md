@@ -1,14 +1,14 @@
 # Puppy
 
-![Swift5.6+](https://img.shields.io/badge/Swift-5.6%2B-orange.svg?style=flat)
+![Swift5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange?logo=swift)
 [![release](https://img.shields.io/github/v/release/sushichop/Puppy.svg?color=blue)](https://github.com/sushichop/Puppy/releases)
-[![CocoaPods](https://img.shields.io/cocoapods/v/Puppy.svg?color=blue)](https://cocoapods.org/pods/Puppy)
-![CI](https://github.com/sushichop/Puppy/workflows/CI/badge.svg)
-[![codecov](https://codecov.io/gh/sushichop/Puppy/branch/main/graph/badge.svg)](https://codecov.io/gh/sushichop/Puppy)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sushichop/Puppy/blob/master/LICENSE)
+[![codecov](https://codecov.io/gh/sushichop/Puppy/branch/main/graph/badge.svg)](https://codecov.io/gh/sushichop/Puppy)
 
-![platforms](https://img.shields.io/badge/Platforms-macOS%20%7C%20iOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20Linux%20%7C%20Windows-orange.svg?style=flat)
-![SwiftPM|CMake|Bazel|Carthage](https://img.shields.io/badge/SwiftPM%20%7C%20CMake%20%7C%20Bazel%20%7C%20Carthage-compatible-4BC51D.svg?style=flat)
+![CI](https://github.com/sushichop/Puppy/workflows/CI/badge.svg)
+[![Darwin](https://github.com/sushichop/Puppy/actions/workflows/darwin.yml/badge.svg?branch=main)](https://github.com/sushichop/Puppy/actions/workflows/darwin.yml)
+[![Linux](https://github.com/sushichop/Puppy/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/sushichop/Puppy/actions/workflows/linux.yml)
+[![Windows](https://github.com/sushichop/Puppy/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/sushichop/Puppy/actions/workflows/windows.yml)
 
 ### **Puppy is a flexible logging library written in Swift** 🐶
 
@@ -40,9 +40,7 @@ let file = FileLogger("com.example.yourapp.file",
                       fileURL: fileURL,
                       filePermission: "600")  // Default permission is "640". 
 
-var log = Puppy()
-log.add(console)
-log.add(file)
+let puppy = Puppy(loggers: [console, file])
 
 log.debug("DEBUG message")  // Will NOT be logged.
 log.info("INFO message")    // Will be logged.
@@ -69,8 +67,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var log = Puppy()
-        log.add(fileRotation)
+        let puppy = Puppy(loggers: [fileRotation])
         log.info("INFO message")
         log.warning("WARNING message")
     }
@@ -98,9 +95,7 @@ import Puppy
 let console = ConsoleLogger("com.example.yourapp.console")
 let syslog = SystemLogger("com.example.yourapp.syslog")
 
-var puppy = Puppy()
-puppy.add(console)
-puppy.add(syslog)
+let puppy = Puppy(loggers: [console, syslog])
 
 LoggingSystem.bootstrap {
     var handler = PuppyLogHandler(label: $0, puppy: puppy)
@@ -129,8 +124,7 @@ let rotationConfig = RotationConfig(suffixExtension: .numbering,
 let fileRotation = try FileRotationLogger("com.example.yourapp.server",
                                           fileURL: fileURL,
                                           rotationConfig: rotationConfig)
-var puppy = Puppy()
-puppy.add(fileRotation)
+let puppy = Puppy(loggers: [fileRotation])
 
 // https://docs.vapor.codes/basics/logging/
 var env = try Environment.detect()
@@ -160,8 +154,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var log = Puppy()
-        log.add(oslog)
+        let puppy = Puppy(loggers: [oslog])
         log.info("INFO message")
         log.warning("WARNING message")
     }

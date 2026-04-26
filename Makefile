@@ -1,8 +1,8 @@
 .DEFAULT_GOAL := help
 HELP_INDENT := 28
 
-SWIFT_VERSION := 5.7.2
-DISTRIBUTION := jammy
+SWIFT_VERSION := 6.1.2
+DISTRIBUTION := noble
 
 .PHONY: help
 help:
@@ -90,6 +90,16 @@ bazel-build: ## Run bazel build
 bazel-build-linux: ## Run bazel build on Linux container
 	@echo "Deleting Bazel artifacts..." && rm -rf bazel-*
 	docker run --rm --volume "$(CURDIR):/src" --workdir "/src" swift:$(SWIFT_VERSION)-$(DISTRIBUTION) /bin/sh -c "DISTRIBUTION=$(DISTRIBUTION) ./scripts/bazel-script.sh"
+
+.PHONY: bazel-test
+bazel-test: ## Run bazel test
+	@echo "Deleting Bazel artifacts..." && rm -rf bazel-*
+	SCRIPT_TYPE=test ./scripts/bazel-script.sh
+
+.PHONY: bazel-test-linux
+bazel-test-linux: ## Run bazel test on Linux container
+	@echo "Deleting Bazel artifacts..." && rm -rf bazel-*
+	docker run --rm --volume "$(CURDIR):/src" --workdir "/src" swift:$(SWIFT_VERSION)-$(DISTRIBUTION) /bin/sh -c "SCRIPT_TYPE=test DISTRIBUTION=$(DISTRIBUTION) ./scripts/bazel-script.sh"
 
 .PHONY: cmake-build
 cmake-build: ## Run cmake build

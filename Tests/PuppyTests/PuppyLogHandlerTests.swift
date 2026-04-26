@@ -3,14 +3,6 @@ import Puppy
 
 final class PuppyLogHandlerTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-    }
-
-    override func tearDownWithError() throws {
-        try super.tearDownWithError()
-    }
-
     func testLoggingSystem() throws {
         #if canImport(Logging)
 
@@ -19,8 +11,7 @@ final class PuppyLogHandlerTests: XCTestCase {
         // let bool3 = ["b": nil].isEmpty  // false
 
         let consoleLogger: ConsoleLogger = .init("com.example.yourapp.consolelogger.swiftlog", logLevel: .trace)
-        var puppy = Puppy()
-        puppy.add(consoleLogger)
+        let puppy = Puppy(loggers: [consoleLogger])
 
         LoggingSystem.bootstrap {
             var handler = PuppyLogHandler(label: $0, puppy: puppy)
@@ -42,8 +33,6 @@ final class PuppyLogHandlerTests: XCTestCase {
         logger.warning("WARNING message using PuppyLogHandler", metadata: ["keyWARNING": "true"])
         logger.error("ERROR message using PuppyLogHandler", metadata: ["keyB": "DEF"])
         logger.critical("CRITICAL message using PuppyLogHandler")
-
-        puppy.remove(consoleLogger)
 
         #endif // canImport(Logging)
     }

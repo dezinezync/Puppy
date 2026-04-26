@@ -2,13 +2,6 @@ import XCTest
 import Puppy
 
 final class LoggerableTests: XCTestCase {
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-    }
-
-    override func tearDownWithError() throws {
-        try super.tearDownWithError()
-    }
 
     func testLoggerableLogLevel() throws {
         let mockLogger: MockLogger = .init("com.example.yourapp.mocklogger.loglevel", logLevel: .debug)
@@ -62,7 +55,11 @@ final class LoggerableTests: XCTestCase {
                 "CRITICAL message",
             ])
             XCTAssertEqual(mockLogFormatter.invokedFormatMessageTags, ["", "critical-tag"])
+            #if BAZEL_TESTING
+            XCTAssertEqual(mockLogFormatter.invokedFormatMessageModuleNames, ["puppy_tests", "puppy_tests"])
+            #else
             XCTAssertEqual(mockLogFormatter.invokedFormatMessageModuleNames, ["PuppyTests", "PuppyTests"])
+            #endif
             XCTAssertEqual(mockLogFormatter.invokedFormatMessageFileNames, ["LoggerableTests.swift", "LoggerableTests.swift"])
             XCTAssertEqual(mockLogFormatter.invokedFormatMessageSwiftLogInfo, ["source": ""])
             XCTAssertEqual(mockLogFormatter.invokedFormatMessageLabel, "com.example.yourapp.mocklogger.logformat")

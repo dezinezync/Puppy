@@ -16,107 +16,62 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['macos-latest', 'ubuntu-20.04', 'windows-latest']
-        swift-version: ['5.6', '5.7.2']
+        os: ['macos-15']
+        swift-version: ['6.1.2']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode if needed - Swift ${{ matrix.swift-version }} 
         if: runner.os == 'macOS'
         run: |
-          ls -al /Applications
-          if [ '${{ matrix.swift-version }}' = '5.6' ]; then echo DEVELOPER_DIR=/Applications/Xcode_13.3.app >> $GITHUB_ENV; fi
-          if [ '${{ matrix.swift-version }}' = '5.7.2' ]; then echo DEVELOPER_DIR=/Applications/Xcode_14.2.app >> $GITHUB_ENV; fi
-      - uses: sushichop/gha-swift-env@v1
+          ls -al /Applications | grep Xcode
+          if [ '${{ matrix.swift-version }}' = '6.1.2' ]; then echo DEVELOPER_DIR=/Applications/Xcode_16.4.app >> $GITHUB_ENV; fi
+      - uses: sushichop/gha-swift-env@main
         with:
           swift-version: ${{ matrix.swift-version }}
-      - name: Build a Swift package
+      - name: Show Swift version
+        run: swift --version
+      - name: Build Swift package
         run: swift build -v -c release
-      - name: Test a Swift package
-        run: swift test -v -Xswiftc -DPUPPY_DEBUG
-
-  cmake:
-    name: CMake - Swift ${{ matrix.swift-version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
-        swift-version: ['5.7.2']
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v3
-      - name: Select Xcode if needed - Swift ${{ matrix.swift-version }} 
-        if: runner.os == 'macOS'
-        run: |
-          ls -al /Applications
-          if [ '${{ matrix.swift-version }}' = '5.6' ]; then echo DEVELOPER_DIR=/Applications/Xcode_13.3.app >> $GITHUB_ENV; fi
-          if [ '${{ matrix.swift-version }}' = '5.7.2' ]; then echo DEVELOPER_DIR=/Applications/Xcode_14.2.app >> $GITHUB_ENV; fi
-      - uses: sushichop/gha-swift-env@v1
-        with:
-          swift-version: ${{ matrix.swift-version }}
-      - name: Build with CMake and Ninja
-        shell: bash
-        run: ./scripts/cmake-script.sh
+      - name: Test Swift package
+        run: swift test -v -Xswiftc -warnings-as-errors
 
   codecov:
     name: codecov - Xcode ${{ matrix.xcode }}
-    runs-on: macos-latest
+    runs-on: macos-15
     strategy:
       matrix:
-        xcode: ['14.2']
+        xcode: ['16.4']
       fail-fast: false
     env:
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: export-codecov
         run: make export-codecov
       - name: codecov
         if: success()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
-          file: coverage.lcov
+          files: coverage.lcov
           token: ${{ secrets.CODECOV_TOKEN }}
 
   xcode:
     name: ${{ matrix.make-target }} - Xcode ${{ matrix.xcode }}
-    runs-on: macos-latest
+    runs-on: macos-15
     strategy:
       matrix:
         make-target:
           [
             xcode-test,
-            xcode-build,
             pod-lib-lint,
-            carthage-build-workaround,
             carthage-build-xcframeworks,
+            bazel-test,
           ]
-        xcode: ['14.2']
+        xcode: ['16.4']
       fail-fast: false
     env:
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: make ${{ matrix.make-target }}
-
-  bazel:
-    name: Bazel - Swift ${{ matrix.swift-version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ['macos-latest', 'ubuntu-latest']
-        swift-version: ['5.7.2']
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v3
-      - name: Select Xcode if needed - Swift ${{ matrix.swift-version }} 
-        if: runner.os == 'macOS'
-        run: |
-          ls -al /Applications
-          if [ '${{ matrix.swift-version }}' = '5.6' ]; then echo DEVELOPER_DIR=/Applications/Xcode_13.3.app >> $GITHUB_ENV; fi
-          if [ '${{ matrix.swift-version }}' = '5.7.2' ]; then echo DEVELOPER_DIR=/Applications/Xcode_14.2.app >> $GITHUB_ENV; fi
-      - uses: sushichop/gha-swift-env@v1
-        with:
-          swift-version: ${{ matrix.swift-version }}
-      - name: Build with Bazel
-        run: ./scripts/bazel-script.sh
